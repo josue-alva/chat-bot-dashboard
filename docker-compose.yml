@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  ssh-tunnel-dashboard:
+    image: alpine:3.19
+    container_name: ssh-tunnel-dashboard
+    restart: unless-stopped
+    env_file:
+      - .env    # aquí defines SSH_HOST, SSH_USER, SSH_PASSWORD, DB_PRIVATE_HOST, DB_PRIVATE_PORT
+    ports:
+      - "3309:3306"   # queda disponible en 127.0.0.1:3309
+    command:
+      - sh
+      - -lc
+      - >
+        apk add --no-cache openssh-client sshpass &&
+        sshpass -p "$SSH_PASSWORD" ssh
+        -o StrictHostKeyChecking=no
+        -o ExitOnForwardFailure=yes
+        -o PreferredAuthentications=password
+        -o PubkeyAuthentication=no
+        -o ServerAliveInterval=10
+        -o ServerAliveCountMax=3
+        -N -L 0.0.0.0:3306:${DB_PRIVATE_HOST}:${DB_PRIVATE_PORT}
+        ${SSH_USER}@${SSH_HOST}
