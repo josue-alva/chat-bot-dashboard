@@ -3,34 +3,22 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getPool } from "../../../lib/db";
 
 export async function GET(req: Request) {
+  const base = process.env.API_BASE!;
+  const key  = process.env.API_KEY!;
+  const url  = new URL(req.url);
+  const limit = url.searchParams.get("limit") || "100";
+
   try {
-    const url = new URL(req.url);
-    const limit = Math.min(Number(url.searchParams.get("limit") || "50"), 200);
-
-    const [rows] = await getPool().query(
-      `SELECT message_id, reply_to_id, flow, intent_seed, text
-       FROM wa_messages
-       ORDER BY message_id DESC
-       LIMIT ?`,
-      [limit]
-    );
-
-    return NextResponse.json({ ok: true, rows });
+    const r = await fetch(`${base}/wa-messages?limit=${limit}`, {
+      headers: { "X-API-Key": key },
+      cache: "no-store",
+    });
+    const data = await r.json();
+    return NextResponse.json(data, { status: r.status });
   } catch (err: any) {
-    console.error("WA-MESSAGES ERROR:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        error: err?.message || String(err),
-        code: err?.code,
-        errno: err?.errno,
-        sqlState: err?.sqlState,
-        sqlMessage: err?.sqlMessage,
-      },
-      { status: 500 }
-    );
+    console.error("Proxy /wa-messages error:", err);
+    return NextResponse.json({ ok: false, error: err?.message }, { status: 500 });
   }
 }

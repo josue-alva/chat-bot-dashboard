@@ -8,11 +8,17 @@ export default async function Home() {
   const proto = h.get("x-forwarded-proto") ?? "http";
   const base = `${proto}://${host}`;
 
-  const res = await fetch(`${base}/api/dashboard`, { cache: "no-store" });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API /dashboard ${res.status}: ${text.slice(0, 300)}`);
-  }
+  // const res = await fetch(`${base}/api/dashboard`, { cache: "no-store" });
+  // if (!res.ok) {
+  //   const text = await res.text();
+  //   throw new Error(`API /dashboard ${res.status}: ${text.slice(0, 300)}`);
+  // }
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard`, {
+    cache: "no-store",
+    headers: { "X-API-Key": process.env.NEXT_PUBLIC_API_KEY! },
+  });
+
   const data = (await res.json()) as {
     ok: boolean;
     users: number;
