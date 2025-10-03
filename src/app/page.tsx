@@ -12,8 +12,8 @@ type DashboardResponse = {
 };
 
 export default async function Home() {
-  const API_BASE = process.env.API_BASE;
-  const API_KEY = process.env.API_KEY;
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE!;
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY!;
 
   if (!API_BASE) {
     throw new Error(
