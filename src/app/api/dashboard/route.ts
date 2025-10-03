@@ -1,4 +1,5 @@
-// src/app/api/dashboard/route.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 

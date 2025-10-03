@@ -50,7 +50,7 @@ export default function MessagesTable({ messages }: Props) {
   const filtered = useMemo(() => {
   const q = query.trim().toLowerCase();
 
-  let rows = messages.filter((m) => {
+  const rows = messages.filter((m) => {
     const intentOk = intent === "__ALL__" || m.intent_seed === intent;
     const dirOk = direction === "__ALL__" || m.direction === direction;
 
